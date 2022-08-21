@@ -7,6 +7,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import { keyLayout } from '../../../../../__fixtures__/key-layout'
 import {
   openedUrl,
+  readiedApp,
   receivedRendererStartupSignal,
   retrievedInstalledApps,
 } from '../../../../main/state/actions'
@@ -38,6 +39,7 @@ afterAll(() => {
 test('kitchen sink', () => {
   render(<Wrapper />)
   const win = new electron.BrowserWindow()
+  win.webContents.send(Channel.MAIN, readiedApp())
   win.webContents.send(
     Channel.MAIN,
     retrievedInstalledApps([
@@ -160,10 +162,6 @@ test('should use hotkey', () => {
   const win = new electron.BrowserWindow()
   win.webContents.send(
     Channel.MAIN,
-    retrievedInstalledApps(['com.apple.Safari']),
-  )
-  win.webContents.send(
-    Channel.MAIN,
     receivedRendererStartupSignal({
       storage: {
         apps: [
@@ -202,10 +200,6 @@ test('should use hotkey', () => {
 test('should use hotkey with alt', () => {
   render(<Wrapper />)
   const win = new electron.BrowserWindow()
-  win.webContents.send(
-    Channel.MAIN,
-    retrievedInstalledApps(['com.apple.Safari']),
-  )
 
   win.webContents.send(
     Channel.MAIN,
@@ -252,6 +246,7 @@ test('should use hotkey with alt', () => {
 test('should hold shift', () => {
   render(<Wrapper />)
   const win = new electron.BrowserWindow()
+  win.webContents.send(Channel.MAIN, readiedApp())
   win.webContents.send(
     Channel.MAIN,
     retrievedInstalledApps(['org.mozilla.firefox']),
@@ -282,7 +277,13 @@ test('should order tiles', () => {
     Channel.MAIN,
     receivedRendererStartupSignal({
       storage: {
-        apps: [],
+        apps: [
+          { id: 'org.mozilla.firefox', hotCode: '', isInstalled: true },
+          { id: 'com.apple.Safari', hotCode: '', isInstalled: true },
+          { id: 'com.operasoftware.Opera', hotCode: '', isInstalled: true },
+          { id: 'com.microsoft.edgemac', hotCode: '', isInstalled: true },
+          { id: 'com.brave.Browser', hotCode: '', isInstalled: true },
+        ],
         supportMessage: -1,
         height: 200,
         isSetup: true,
@@ -291,16 +292,19 @@ test('should order tiles', () => {
     }),
   )
 
+  win.webContents.send(Channel.MAIN, readiedApp())
+
   win.webContents.send(
     Channel.MAIN,
     retrievedInstalledApps([
-      'org.mozilla.firefox',
-      'com.apple.Safari',
-      'com.operasoftware.Opera',
-      'com.microsoft.edgemac',
       'com.brave.Browser',
+      'com.microsoft.edgemac',
+      'org.mozilla.firefox',
+      'com.operasoftware.Opera',
+      'com.apple.Safari',
     ]),
   )
+
   // Check tiles and tile logos shown
   const apps = screen.getAllByRole('button', { name: /[A-z]+ App/u })
 

@@ -36,11 +36,13 @@ export async function getAppIcons(apps: Storage['apps']): Promise<void> {
     const icons: Partial<Record<AppId, string>> = {}
 
     for await (const app of apps) {
-      try {
-        const dataURI = await getIconDataURI(app.id, 64)
-        icons[app.id] = dataURI
-      } catch (error: unknown) {
-        log.warn(error)
+      if (app.isInstalled) {
+        try {
+          const dataURI = await getIconDataURI(app.id, 64)
+          icons[app.id] = dataURI
+        } catch (error: unknown) {
+          log.warn(error)
+        }
       }
     }
 

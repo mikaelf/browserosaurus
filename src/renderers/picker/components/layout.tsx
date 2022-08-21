@@ -44,10 +44,6 @@ const App: React.FC = () => {
 
   const keyCodeMap = useKeyCodeMap()
 
-  // const totalApps = apps.length
-
-  // useEffect(() => {}, [totalApps])
-
   return (
     <div
       className="relative flex h-screen w-screen select-none flex-col items-center px-2 pt-4 dark:text-white"

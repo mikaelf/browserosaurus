@@ -1,6 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit'
 
 import type { AppId } from '../../config/apps'
+import { apps } from '../../config/apps'
 import {
   changedPickerWindowBounds,
   readiedApp,
@@ -16,6 +17,7 @@ import {
   reorderedApp,
   updatedHotCode,
 } from '../../renderers/prefs/state/actions'
+import { getKeys } from '../utils/get-keys'
 
 interface Storage {
   apps: {
@@ -39,6 +41,34 @@ const storage = createReducer<Storage>(defaultStorage, (builder) =>
   builder
     .addCase(readiedApp, (state) => {
       state.isSetup = true
+
+      // Remove apps from storage that B doesn't support
+      for (const storedApp of state.apps) {
+        if (!apps[storedApp.id]) {
+          const storedAppIndex = state.apps.findIndex(
+            (app) => app.id === storedApp.id,
+          )
+
+          if (storedAppIndex !== -1) {
+            state.apps.splice(storedAppIndex, 1)
+          }
+        }
+      }
+
+      // Add apps to storage that B supports
+      for (const configAppId of getKeys(apps)) {
+        const storedAppsDoesntContainConfigApp = state.apps.every(
+          (app) => app.id !== configAppId,
+        )
+
+        if (storedAppsDoesntContainConfigApp) {
+          state.apps.push({
+            id: configAppId,
+            hotCode: null,
+            isInstalled: false,
+          })
+        }
+      }
     })
 
     .addCase(confirmedReset, () => defaultStorage)
@@ -51,21 +81,12 @@ const storage = createReducer<Storage>(defaultStorage, (builder) =>
     .addCase(retrievedInstalledApps, (state, action) => {
       const installedAppIds = action.payload
 
-      for (const storedApp of state.apps) {
-        storedApp.isInstalled = installedAppIds.includes(storedApp.id)
-      }
-
-      for (const installedAppId of installedAppIds) {
-        const installedAppInStorage = state.apps.some(
-          ({ id }) => id === installedAppId,
-        )
-
-        if (!installedAppInStorage) {
-          state.apps.push({
-            id: installedAppId,
-            hotCode: null,
-            isInstalled: true,
-          })
+      for (const app of state.apps) {
+        if (installedAppIds.includes(app.id)) {
+          app.isInstalled = true
+        } else {
+          app.isInstalled = false
+          app.hotCode = null
         }
       }
     })
