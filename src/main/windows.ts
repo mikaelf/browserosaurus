@@ -127,40 +127,40 @@ async function createWindows(): Promise<void> {
 }
 
 function showPickerWindow(): void {
-  if (pickerWindow) {
-    const displayBounds = screen.getDisplayNearestPoint(
-      screen.getCursorScreenPoint(),
-    ).bounds
+  if (!pickerWindow) return
 
-    const displayEnd = {
-      x: displayBounds.x + displayBounds.width,
-      y: displayBounds.y + displayBounds.height,
-    }
+  const displayBounds = screen.getDisplayNearestPoint(
+    screen.getCursorScreenPoint(),
+  ).bounds
 
-    const mousePoint = screen.getCursorScreenPoint()
-
-    const bWindowBounds = pickerWindow.getBounds()
-
-    const nudge = {
-      x: -125,
-      y: -30,
-    }
-
-    const inWindowPosition = {
-      x:
-        mousePoint.x + bWindowBounds.width + nudge.x > displayEnd.x
-          ? displayEnd.x - bWindowBounds.width
-          : mousePoint.x + nudge.x,
-      y:
-        mousePoint.y + bWindowBounds.height + nudge.y > displayEnd.y
-          ? displayEnd.y - bWindowBounds.height
-          : mousePoint.y + nudge.y,
-    }
-
-    pickerWindow.setPosition(inWindowPosition.x, inWindowPosition.y, false)
-
-    pickerWindow.show()
+  const displayEnd = {
+    x: displayBounds.x + displayBounds.width,
+    y: displayBounds.y + displayBounds.height,
   }
+
+  const mousePoint = screen.getCursorScreenPoint()
+
+  const bWindowBounds = pickerWindow.getBounds()
+
+  const nudge = {
+    x: -125,
+    y: -30,
+  }
+
+  const inWindowPosition = {
+    x:
+      mousePoint.x + bWindowBounds.width + nudge.x > displayEnd.x
+        ? displayEnd.x - bWindowBounds.width
+        : mousePoint.x + nudge.x,
+    y:
+      mousePoint.y + bWindowBounds.height + nudge.y > displayEnd.y
+        ? displayEnd.y - bWindowBounds.height
+        : mousePoint.y + nudge.y,
+  }
+
+  pickerWindow.setPosition(inWindowPosition.x, inWindowPosition.y, false)
+
+  pickerWindow.show()
 }
 
 function showPrefsWindow(): void {
