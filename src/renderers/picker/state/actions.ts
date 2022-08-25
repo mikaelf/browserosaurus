@@ -19,6 +19,7 @@ const pressedKey = picker<{
   metaKey: boolean
   altKey: boolean
   shiftKey: boolean
+  appsLength: number
 }>('key/pressed')
 
 const clickedUrlBar = picker('url-bar/clicked')

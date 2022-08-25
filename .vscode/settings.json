@@ -15,6 +15,7 @@
     "maximizable",
     "minimizable",
     "Namespacer",
+    "picocolors",
     "relocator"
   ]
 }

@@ -27,6 +27,8 @@ const gotDefaultBrowserStatus = main<boolean>('default-browser-status/got')
 
 const gotAppIcons = main<Partial<Record<AppId, string>>>('app-icons/got')
 
+const gotAccentColor = main<string>('accent-color/got')
+
 const availableUpdate = main('update/available')
 const downloadingUpdate = main('update/downloading')
 const downloadedUpdate = main('update/downloaded')
@@ -43,6 +45,7 @@ export {
   clickedRestorePicker,
   downloadedUpdate,
   downloadingUpdate,
+  gotAccentColor,
   gotAppIcons,
   gotDefaultBrowserStatus,
   openedUrl,

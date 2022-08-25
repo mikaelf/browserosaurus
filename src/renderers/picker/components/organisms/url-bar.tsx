@@ -30,6 +30,7 @@ const UrlBar: React.FC<Props> = ({ className }) => {
       )}
       onClick={() => dispatch(clickedUrlBar())}
       onKeyDown={() => false}
+      onMouseDown={(event) => event.preventDefault()}
       role="button"
       tabIndex={-1}
     >

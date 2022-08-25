@@ -1,6 +1,6 @@
 /* eslint-disable node/callback-return -- must flush middleware to get nextState */
 /* eslint-disable unicorn/prefer-regexp-test -- rtk uses .match */
-import { app, autoUpdater, shell } from 'electron'
+import { app, autoUpdater, shell, systemPreferences } from 'electron'
 import deepEqual from 'fast-deep-equal'
 
 import { B_URL, ISSUES_URL } from '../../config/CONSTANTS'
@@ -41,6 +41,7 @@ import {
 import {
   clickedOpenPrefs,
   clickedRestorePicker,
+  gotAccentColor,
   openedUrl,
   readiedApp,
   receivedRendererStartupSignal,
@@ -95,6 +96,7 @@ export const actionHubMiddleware =
       createTray()
       initUpdateChecker()
       getInstalledAppIds()
+      dispatch(gotAccentColor(systemPreferences.getAccentColor()))
     }
 
     // When a renderer starts, send down all the locally stored data

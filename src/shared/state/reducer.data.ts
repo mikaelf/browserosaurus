@@ -4,8 +4,10 @@ import type { AppId } from '../../config/apps'
 import { CARROT_URL } from '../../config/CONSTANTS'
 import {
   availableUpdate,
+  clickedRestorePicker,
   downloadedUpdate,
   downloadingUpdate,
+  gotAccentColor,
   gotAppIcons,
   gotDefaultBrowserStatus,
   openedUrl,
@@ -16,6 +18,7 @@ import {
 import {
   clickedDonate,
   clickedUpdateBar,
+  pressedKey,
   startedPicker,
 } from '../../renderers/picker/state/actions'
 import {
@@ -39,6 +42,7 @@ interface Data {
   scanStatus: 'init' | 'scanned' | 'scanning'
   icons: Partial<Record<AppId, string>>
   activeAppIndex: number
+  accentColor: string
 }
 
 const defaultData: Data = {
@@ -53,6 +57,7 @@ const defaultData: Data = {
   scanStatus: 'init',
   icons: {},
   activeAppIndex: 0,
+  accentColor: 'aabbccff',
 }
 
 const data = createReducer<Data>(defaultData, (builder) =>
@@ -77,6 +82,24 @@ const data = createReducer<Data>(defaultData, (builder) =>
       state.prefsStarted = true
     })
 
+    .addCase(pressedKey, (state, action) => {
+      const { physicalKey, appsLength, shiftKey } = action.payload
+
+      // Down
+      if (physicalKey === 'ArrowDown' || (!shiftKey && physicalKey === 'Tab')) {
+        state.activeAppIndex =
+          state.activeAppIndex === appsLength - 1 ? 0 : state.activeAppIndex + 1
+      }
+      // Up
+      else if (
+        physicalKey === 'ArrowUp' ||
+        (shiftKey && physicalKey === 'Tab')
+      ) {
+        state.activeAppIndex =
+          state.activeAppIndex === 0 ? appsLength - 1 : state.activeAppIndex - 1
+      }
+    })
+
     .addCase(gotDefaultBrowserStatus, (state, action) => {
       state.isDefaultProtocolClient = action.payload
     })
@@ -95,6 +118,11 @@ const data = createReducer<Data>(defaultData, (builder) =>
 
     .addCase(openedUrl, (state, action) => {
       state.url = action.payload
+      state.activeAppIndex = 0
+    })
+
+    .addCase(clickedRestorePicker, (state) => {
+      state.activeAppIndex = 0
     })
 
     .addCase(clickedDonate, (state) => {
@@ -113,9 +141,14 @@ const data = createReducer<Data>(defaultData, (builder) =>
       state.icons = action.payload
     })
 
+    .addCase(gotAccentColor, (state, action) => {
+      state.accentColor = action.payload
+    })
+
     .addCase(clickedUpdateBar, (state) => {
       state.prefsTab = 'general'
     }),
 )
 
-export { Data, data, defaultData, PrefsTab }
+export type { Data, PrefsTab }
+export { data, defaultData }

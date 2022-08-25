@@ -9,7 +9,7 @@ import {
   useKeyCodeMap,
   useSelector,
 } from '../../shared/state/hooks'
-import { appsRef, appsScrollerRef } from '../refs'
+import { appsRef } from '../refs'
 import { clickedApp, startedPicker } from '../state/actions'
 import AppLogo from './atoms/app-logo'
 import Kbd from './atoms/kbd'
@@ -39,6 +39,8 @@ const App: React.FC = () => {
   useKeyboardEvents()
 
   const apps = useInstalledApps()
+  const activeAppIndex = useSelector((state) => state.data.activeAppIndex)
+  const accentColor = useSelector((state) => state.data.accentColor)
   const url = useSelector((state) => state.data.url)
   const icons = useDeepEqualSelector((state) => state.data.icons)
 
@@ -55,66 +57,61 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div
-        ref={appsScrollerRef}
-        className="relative w-full grow overflow-y-auto px-2 pb-2"
-      >
+      <div className="relative w-full grow overflow-y-auto px-2 pb-2">
         {apps.map((app, index) => {
           const key = app.id + index
           return (
-            <div key={key}>
-              <button
-                ref={(element) => {
-                  if (!appsRef.current) {
-                    appsRef.current = []
-                  }
-
-                  if (element) {
-                    appsRef.current[index] = element
-                  }
-                }}
-                aria-label={`${app.name} App`}
-                className={clsx(
-                  'flex h-12 w-full shrink-0 items-center justify-between space-x-4 px-4 py-2 text-left',
-                  'focus:bg-blue-500 focus:text-white focus:outline-none focus:dark:bg-blue-700',
-                  'hover:bg-black/10 hover:dark:bg-blue-50/10',
-                  'rounded-xl',
-                )}
-                onClick={(event) =>
-                  dispatch(
-                    clickedApp({
-                      appId: app.id,
-                      isAlt: event.altKey,
-                      isShift: event.shiftKey,
-                    }),
-                  )
+            <button
+              key={key}
+              ref={(element) => {
+                if (!appsRef.current) {
+                  appsRef.current = []
                 }
-                onKeyDown={(event) => {
-                  if (event.code === 'ArrowDown') {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    appsRef.current?.[index + 1].focus()
-                  } else if (event.code === 'ArrowUp') {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    appsRef.current?.[index - 1].focus()
-                  }
-                }}
-                type="button"
-              >
-                <span>{app.name}</span>
-                <span className="flex items-center space-x-4">
-                  {app.hotCode ? (
-                    <Kbd className="shrink-0">{keyCodeMap[app.hotCode]}</Kbd>
-                  ) : null}
-                  <AppLogo
-                    app={app}
-                    className="h-6 w-6 shrink-0"
-                    icon={icons[app.id]}
-                  />
-                </span>
-              </button>
-            </div>
+
+                if (element) {
+                  appsRef.current[index] = element
+                }
+              }}
+              aria-label={`${app.name} App`}
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- this allows the first browser to get focus on first load
+              autoFocus={activeAppIndex === 0}
+              className={clsx(
+                'flex h-12 w-full shrink-0 items-center justify-between space-x-4 px-4 py-2 text-left outline-none',
+                activeAppIndex === index
+                  ? 'text-white'
+                  : 'hover:bg-black/10 hover:dark:bg-blue-50/10',
+                'rounded-xl',
+              )}
+              onBlur={(event) => event.preventDefault()}
+              onClick={(event) => {
+                event.preventDefault()
+                dispatch(
+                  clickedApp({
+                    appId: app.id,
+                    isAlt: event.altKey,
+                    isShift: event.shiftKey,
+                  }),
+                )
+              }}
+              onMouseDown={(event) => event.preventDefault()}
+              style={{
+                backgroundColor:
+                  activeAppIndex === index ? `#${accentColor}` : 'inherit',
+              }}
+              type="button"
+            >
+              <span>{app.name}</span>
+              <span className="flex items-center space-x-4">
+                {app.hotCode ? (
+                  <Kbd className="shrink-0">{keyCodeMap[app.hotCode]}</Kbd>
+                ) : null}
+                <AppLogo
+                  app={app}
+                  className="h-6 w-6 shrink-0"
+                  icon={icons[app.id]}
+                />
+              </span>
+            </button>
           )
         })}
       </div>

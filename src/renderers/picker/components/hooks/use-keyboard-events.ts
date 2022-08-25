@@ -1,14 +1,17 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
+import { useInstalledApps } from '../../../shared/state/hooks'
 import { pressedKey } from '../../state/actions'
 
 export const useKeyboardEvents = (): void => {
   const dispatch = useDispatch()
+  const apps = useInstalledApps()
+  const appsLength = apps.length
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
-      if (['Tab', 'Enter', 'Space'].includes(event.code)) {
+      if (['Enter', 'Space'].includes(event.code)) {
         return
       }
 
@@ -21,6 +24,7 @@ export const useKeyboardEvents = (): void => {
           metaKey: event.metaKey,
           altKey: event.altKey,
           shiftKey: event.shiftKey,
+          appsLength,
         }),
       )
     }
@@ -30,5 +34,5 @@ export const useKeyboardEvents = (): void => {
     return function cleanup() {
       document.removeEventListener('keydown', handler)
     }
-  }, [dispatch])
+  }, [dispatch, appsLength])
 }

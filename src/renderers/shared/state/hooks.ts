@@ -49,8 +49,8 @@ const useIsSupportMessageHidden = (): boolean => {
 const useKeyCodeMap = (): Record<string, string> =>
   useShallowEqualSelector((state) => state.data.keyCodeMap)
 
+export type { InstalledApp }
 export {
-  InstalledApp,
   useDeepEqualSelector,
   useInstalledApps,
   useIsSupportMessageHidden,
