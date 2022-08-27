@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-regexp-test */
 /* eslint-disable no-console */
 
 import {
@@ -20,6 +21,12 @@ const channelColorMap = {
   [Channel.PICKER]: bgMagenta,
 }
 
+/**
+ * Toggle this to turn on full payload logging, otherwise just single line
+ * values will be displayed: strings, numbers etc.
+ */
+const verboseActionLog = false
+
 export function actionLogger(action: FSA): void {
   const channel = action.meta?.channel as Channel
   const [namespace] = action.type.split('/')
@@ -29,9 +36,19 @@ export function actionLogger(action: FSA): void {
   const namespaceLog = bold(green(namespace))
   const typeLog = bold(white(type))
 
-  console.log(`${channelLog} ${namespaceLog}/${typeLog}`)
+  const simplePayload =
+    typeof action.payload === 'object' || typeof action.payload === 'undefined'
+      ? ''
+      : gray(` ${action.payload}`)
 
-  if (action.payload) {
+  console.log(`${channelLog} ${namespaceLog}/${typeLog}${simplePayload}`)
+
+  if (
+    verboseActionLog &&
+    action.payload &&
+    typeof action.payload === 'object'
+  ) {
+    console.groupCollapsed()
     console.log(
       gray(
         JSON.stringify(
@@ -47,5 +64,6 @@ export function actionLogger(action: FSA): void {
         ),
       ),
     )
+    console.groupEnd()
   }
 }
