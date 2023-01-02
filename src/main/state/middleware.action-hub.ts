@@ -93,12 +93,29 @@ export const actionHubMiddleware =
 
     // Main's process is ready
     if (readiedApp.match(action)) {
+      let hasJsConfig = false
+
+      try {
+        const t = importFresh(
+          path.join(os.homedir(), 'browserosaurus.config.js'),
+        )
+
+        // eslint-disable-next-line no-console
+        console.log(typeof t === 'object' && t && 'moo' in t && t.moo)
+        hasJsConfig = true
+      } catch {
+        hasJsConfig = false
+      }
+
       // Hide from dock and cmd-tab
       app.dock.hide()
-      createWindows()
-      createTray()
+      createWindows(hasJsConfig)
+      createTray(hasJsConfig)
       initUpdateChecker()
-      getInstalledAppNames()
+
+      if (!hasJsConfig) {
+        getInstalledAppNames()
+      }
     }
 
     // When a renderer starts, send down all the locally stored data
@@ -184,8 +201,6 @@ export const actionHubMiddleware =
 
     // Tray: restore picker
     else if (clickedRestorePicker.match(action)) {
-      const t = importFresh(path.join(os.homedir(), 'browserosaurus.config.js'))
-      console.log(typeof t === 'object' && t && 'moo' in t && t.moo)
       showPickerWindow()
     }
 

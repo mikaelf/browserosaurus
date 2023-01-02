@@ -9,11 +9,9 @@ let tray: Tray | undefined
 /**
  * Menubar icon
  */
-export function createTray(): void {
-  tray = new Tray(path.join(__dirname, '/static/icon/tray_iconTemplate.png'))
-
-  tray.setPressedImage(
-    path.join(__dirname, '/static/icon/tray_iconHighlight.png'),
+export function createTray(hasJsConfig: boolean): void {
+  tray = new Tray(
+    path.join(__dirname, '/static/icon/tray_iconUpdateTemplate.png'),
   )
 
   tray.setToolTip('Browserosaurus')
@@ -29,6 +27,7 @@ export function createTray(): void {
       },
       {
         click: () => dispatch(clickedOpenPrefs()),
+        enabled: !hasJsConfig,
         label: 'Preferences...',
       },
       {

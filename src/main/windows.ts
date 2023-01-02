@@ -17,51 +17,53 @@ declare const PREFS_WINDOW_PRELOAD_WEBPACK_ENTRY: string
 let pickerWindow: BrowserWindow | null | undefined
 let prefsWindow: BrowserWindow | null | undefined
 
-async function createWindows(): Promise<void> {
-  prefsWindow = new BrowserWindow({
-    // Only show on demand
-    show: false,
+async function createWindows(hasJsConfig: boolean): Promise<void> {
+  if (!hasJsConfig) {
+    prefsWindow = new BrowserWindow({
+      // Only show on demand
+      show: false,
 
-    // Chrome
-    center: true,
-    fullscreen: false,
-    fullscreenable: false,
-    height: 500,
-    maximizable: false,
-    minimizable: false,
-    resizable: false,
-    titleBarStyle: 'hidden',
-    transparent: true,
-    vibrancy: 'window',
-    width: 600,
+      // Chrome
+      center: true,
+      fullscreen: false,
+      fullscreenable: false,
+      height: 500,
+      maximizable: false,
+      minimizable: false,
+      resizable: false,
+      titleBarStyle: 'hidden',
+      transparent: true,
+      vibrancy: 'window',
+      width: 600,
 
-    // Meta
-    icon: path.join(__dirname, '/static/icon/icon.png'),
-    title: 'Preferences',
+      // Meta
+      icon: path.join(__dirname, '/static/icon/icon.png'),
+      title: 'Preferences',
 
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false,
-      nodeIntegrationInSubFrames: false,
-      nodeIntegrationInWorker: false,
-      preload: PREFS_WINDOW_PRELOAD_WEBPACK_ENTRY,
-    },
-  })
+      webPreferences: {
+        contextIsolation: true,
+        nodeIntegration: false,
+        nodeIntegrationInSubFrames: false,
+        nodeIntegrationInWorker: false,
+        preload: PREFS_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      },
+    })
 
-  prefsWindow.on('hide', () => {
-    prefsWindow?.hide()
-  })
+    prefsWindow.on('hide', () => {
+      prefsWindow?.hide()
+    })
 
-  prefsWindow.on('close', (event_) => {
-    event_.preventDefault()
-    prefsWindow?.hide()
-  })
+    prefsWindow.on('close', (event_) => {
+      event_.preventDefault()
+      prefsWindow?.hide()
+    })
 
-  prefsWindow.on('show', () => {
-    // There isn't a listener for default protocol client, therefore the check
-    // is made each time the window is brought into focus.
-    dispatch(gotDefaultBrowserStatus(app.isDefaultProtocolClient('http')))
-  })
+    prefsWindow.on('show', () => {
+      // There isn't a listener for default protocol client, therefore the check
+      // is made each time the window is brought into focus.
+      dispatch(gotDefaultBrowserStatus(app.isDefaultProtocolClient('http')))
+    })
+  }
 
   const height = database.get('height')
 
@@ -121,7 +123,7 @@ async function createWindows(): Promise<void> {
   })
 
   await Promise.all([
-    prefsWindow.loadURL(PREFS_WINDOW_WEBPACK_ENTRY),
+    prefsWindow?.loadURL(PREFS_WINDOW_WEBPACK_ENTRY),
     pickerWindow.loadURL(PICKER_WINDOW_WEBPACK_ENTRY),
   ])
 }
