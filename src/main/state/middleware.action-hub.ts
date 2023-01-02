@@ -1,7 +1,11 @@
 /* eslint-disable node/callback-return -- must flush middleware to get nextState */
 /* eslint-disable unicorn/prefer-regexp-test -- rtk uses .match */
+import os from 'node:os'
+import path from 'node:path'
+
 import { app, autoUpdater, shell } from 'electron'
 import deepEqual from 'fast-deep-equal'
+import importFresh from 'import-fresh'
 
 import { B_URL, ISSUES_URL } from '../../config/CONSTANTS'
 import {
@@ -180,6 +184,8 @@ export const actionHubMiddleware =
 
     // Tray: restore picker
     else if (clickedRestorePicker.match(action)) {
+      const t = importFresh(path.join(os.homedir(), 'browserosaurus.config.js'))
+      console.log(typeof t === 'object' && t && 'moo' in t && t.moo)
       showPickerWindow()
     }
 

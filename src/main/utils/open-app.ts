@@ -17,9 +17,9 @@ export function openApp(
   const openArguments: string[] = [
     '-a',
     appName,
-    isAlt ? '--background' : [],
+    isAlt ? '-g' : [],
     isShift && 'privateArg' in selectedApp
-      ? ['--new', '--args', selectedApp.privateArg]
+      ? ['-n', '--args', selectedApp.privateArg]
       : [],
     // In order for private/incognito mode to work the URL needs to be passed
     // in last, _after_ the respective app.privateArg flag
